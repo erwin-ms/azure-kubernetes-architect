@@ -1,0 +1,76 @@
+name: kubectl-apply
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      resource-group:
+        required: true
+        type: string
+      cluster-name:
+        required: true
+        type: string
+      overlays:
+        required: True
+        type: string
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+
+
+# ===============
+#  Configuration
+# ===============
+env:
+  kubeloginVersion: v0.0.11 # https://github.com/Azure/kubelogin/releases
+
+jobs:
+  kubectl:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: test kustomize
+      env:
+        APP_BUILD_SHA: be3996a
+        IMAGE_TAG: dev-be3996a
+      run: kustomize build ${{ inputs.overlays }} | envsubst
+
+    - name: 'Azure Login'
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: install kubelogin
+      run: |
+        curl -LO "https://github.com/Azure/kubelogin/releases/download/${{ env.kubeloginVersion }}/kubelogin-linux-amd64.zip"
+        sudo unzip -j "kubelogin-linux-amd64.zip" -d /usr/local/bin
+        rm -f "kubelogin-linux-amd64.zip"
+        kubelogin --version
+
+    - name: setup kubeconfig
+      run: |
+        # Fails if it doesn't exist
+        touch .kubeconfig-${{ inputs.cluster-name }}
+        chmod 600 .kubeconfig-${{ inputs.cluster-name }}
+
+        # Populate kubeconfig
+        az aks get-credentials \
+          --resource-group ${{ inputs.resource-group }} \
+          --name ${{ inputs.cluster-name }} \
+          --overwrite-existing \
+          --file .kubeconfig-${{ inputs.cluster-name }}
+
+        # Pass kubeconfig to kubelogin to access k8s API
+        kubelogin convert-kubeconfig -l azurecli
+
+        # confirm it works
+        kubectl get pods --namespace aks-architect

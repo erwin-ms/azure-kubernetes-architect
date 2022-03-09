@@ -3,7 +3,8 @@ name: dev
 on:
   push:
     branches:
-    - main
+    # - main
+    - feat/kustomize
 
 permissions:
   id-token: write
@@ -11,9 +12,20 @@ permissions:
 
 jobs:
   docker:
-    uses: ./.github/workflows/job-docker.yaml
+    # uses: ./.github/workflows/job-docker.yaml
+    # with:
+    #   environment: dev
+    # secrets:
+    #   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+    #   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    #   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  deploy:
+    uses: ./.github/workflows/job-deploy.yaml
     with:
       environment: dev
+      resource-group: cloudkube-dev-r9er-rg
+      cluster-name: cloudkube-dev-r9er-cluster
+      overlays: ./manifests/overlays/dev
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
