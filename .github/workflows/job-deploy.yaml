@@ -58,6 +58,8 @@ jobs:
         kubelogin --version
 
     - name: setup kubeconfig
+      env:
+        KUBECONFIG: ${{ github.workspace }}/.kubeconfig-${{ inputs.cluster-name }}
       run: |
         # Fails if it doesn't exist
         touch .kubeconfig-${{ inputs.cluster-name }}
@@ -74,4 +76,4 @@ jobs:
         kubelogin convert-kubeconfig -l azurecli
 
         # confirm it works
-        # kubectl get pods --namespace aks-architect
+        kubectl get pods --namespace aks-architect
