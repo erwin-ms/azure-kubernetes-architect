@@ -56,12 +56,8 @@ runs:
   - id: convert
     name: 'Pass kubeconfig to kubelogin to access k8s API'
     shell: bash
-    run: |
-      kubelogin convert-kubeconfig -l azurecli
-
-  - id: confirm-login
-    shell: bash
     env:
       KUBECONFIG: ${{ github.workspace }}/${{ steps.kubeconfig.outputs.location }}
     run: |
+      kubelogin convert-kubeconfig -l azurecli
       kubectl get pods --namespace aks-architect
