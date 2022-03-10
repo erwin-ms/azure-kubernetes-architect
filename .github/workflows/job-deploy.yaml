@@ -43,12 +43,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: test kustomize
-      env:
-        APP_BUILD_SHA: ${{ inputs.git-sha }}
-        IMAGE_TAG: ${{ inputs.image-tag }}
-      run: kustomize build ${{ inputs.overlays }} | envsubst
-
     - name: 'Azure Login'
       uses: azure/login@v1
       with:
@@ -56,14 +50,14 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: install kubelogin
+    - name:  Install kubelogin
       run: |
         curl -LO "https://github.com/Azure/kubelogin/releases/download/${{ env.kubeloginVersion }}/kubelogin-linux-amd64.zip"
         sudo unzip -j "kubelogin-linux-amd64.zip" -d /usr/local/bin
         rm -f "kubelogin-linux-amd64.zip"
         kubelogin --version
 
-    - name: setup kubeconfig
+    - name: Setup Kubeconfig
       env:
         KUBECONFIG: ${{ github.workspace }}/.kubeconfig-${{ inputs.cluster-name }}
       run: |
@@ -84,7 +78,14 @@ jobs:
         # confirm it works
         kubectl get pods --namespace aks-architect
 
-    - name: clear kubelogin
+    - name: kubectl apply
+      env:
+        APP_BUILD_SHA: ${{ inputs.git-sha }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
+      run: |
+        kustomize build ${{ inputs.overlays }} | envsubst | kubectl apply -f -
+
+    - name: Clear kubelogin
       run: |
         rm ${{ github.workspace }}/.kubeconfig-${{ inputs.cluster-name }}
         kubelogin remove-tokens
