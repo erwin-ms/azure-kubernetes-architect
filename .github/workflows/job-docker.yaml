@@ -51,16 +51,16 @@ jobs:
     - name: 'Docker - Build and Push'
       if: github.ref == 'refs/heads/feat/kustomize' # DEV branch <================ Temp!
       run: |
-        docker build -t ${{ inputs.dev-tag }} .
-        docker push ${{ inputs.dev-tag }}
+        docker build -t ${{ env.imageName}}:${{ inputs.dev-tag }} .
+        docker push ${{ env.imageName}}:${{ inputs.dev-tag }}
 
     # === Promote Image (Staging) ===
     - name: 'Re-tag to Promote'
       if: github.ref == 'refs/heads/staging' # STAGING branch
       run: |
-        docker pull ${{ inputs.dev-tag }}
-        docker tag ${{ inputs.dev-tag }} ${{ inputs.staging-tag }}
-        docker push ${{ inputs.staging-tag }}
+        docker pull ${{ env.imageName}}:${{ inputs.dev-tag }}
+        docker tag ${{ env.imageName}}:${{ inputs.dev-tag }} ${{ env.imageName}}:${{ inputs.staging-tag }}
+        docker push ${{ env.imageName}}:${{ inputs.staging-tag }}
 
     - name: 'Docker - Logout'
       run: docker logout
