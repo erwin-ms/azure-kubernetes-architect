@@ -80,6 +80,7 @@ jobs:
 
     - name: kubectl apply
       env:
+        KUBECONFIG: ${{ github.workspace }}/.kubeconfig-${{ inputs.cluster-name }}
         APP_BUILD_SHA: ${{ inputs.git-sha }}
         IMAGE_TAG: ${{ inputs.image-tag }}
       run: |
