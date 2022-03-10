@@ -37,24 +37,31 @@ runs:
       kubelogin --version
 
   - id: setup
-    name: Setup Kubeconfig
+    name: Create kubeconfig
     shell: bash
-    env:
-      KUBECONFIG: ${{ github.workspace }}/${{ steps.kubeconfig.outputs.location }}
     run: |
-      # Fails if it doesn't exist
       touch ${{ steps.kubeconfig.outputs.location }}
       chmod 600 ${{ steps.kubeconfig.outputs.location }}
 
-      # Populate kubeconfig
+  - id: populate
+    name: 'Populate kubeconfig'
+    shell: bash
+    run: |
       az aks get-credentials \
         --resource-group ${{ inputs.resource-group }} \
         --name ${{ inputs.cluster-name }} \
         --overwrite-existing \
         --file ${{ steps.kubeconfig.outputs.location }}
 
-      # Pass kubeconfig to kubelogin to access k8s API
+  - id: convert
+    name: 'Pass kubeconfig to kubelogin to access k8s API'
+    shell: bash
+    run: |
       kubelogin convert-kubeconfig -l azurecli
 
-      # confirm it works (change??)
+  - id: confirm-login
+    shell: bash
+    env:
+      KUBECONFIG: ${{ github.workspace }}/${{ steps.kubeconfig.outputs.location }}
+    run: |
       kubectl get pods --namespace aks-architect
