@@ -43,7 +43,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: 'Azure Login'
+    - name: 'Login - Azure'
       uses: azure/login@v1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -51,39 +51,11 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - id: kubelogin
-      name: 'Kubernetes Login'
-      uses: ./.github/actions/setup-kubelogin
+      name: 'Login - Kubernetes'
+      uses: ./.github/actions/kubelogin
       with:
         cluster-name: ${{ inputs.cluster-name }}
         resource-group: ${{ inputs.resource-group }}
-
-    # - name:  Install kubelogin
-    #   run: |
-    #     curl -LO "https://github.com/Azure/kubelogin/releases/download/${{ env.kubeloginVersion }}/kubelogin-linux-amd64.zip"
-    #     sudo unzip -j "kubelogin-linux-amd64.zip" -d /usr/local/bin
-    #     rm -f "kubelogin-linux-amd64.zip"
-    #     kubelogin --version
-
-    # - name: Setup Kubeconfig
-    #   env:
-    #     KUBECONFIG: ${{ github.workspace }}/.kubeconfig-${{ inputs.cluster-name }}
-    #   run: |
-    #     # Fails if it doesn't exist
-    #     touch .kubeconfig-${{ inputs.cluster-name }}
-    #     chmod 600 .kubeconfig-${{ inputs.cluster-name }}
-
-    #     # Populate kubeconfig
-    #     az aks get-credentials \
-    #       --resource-group ${{ inputs.resource-group }} \
-    #       --name ${{ inputs.cluster-name }} \
-    #       --overwrite-existing \
-    #       --file .kubeconfig-${{ inputs.cluster-name }}
-
-    #     # Pass kubeconfig to kubelogin to access k8s API
-    #     kubelogin convert-kubeconfig -l azurecli
-
-    #     # confirm it works
-    #     kubectl get pods --namespace aks-architect
 
     - name: kubectl apply
       env:
@@ -93,12 +65,7 @@ jobs:
       run: |
         kustomize build ${{ inputs.overlays }} | envsubst | kubectl apply -f -
 
-    - name: 'Kubernetes Logout'
-      run: |
-        rm ${{ github.workspace }}/${{ steps.kubelogin.outputs.kubeconfig }}
-        kubelogin remove-tokens
-
-    # - uses: ./.github/actions/kubelogout
-    #   name: 'Logout Kubernetes'
-    #   with:
-    #     kubeconfig: ${{ github.workspace }}/${{ steps.kubelogin.outputs.kubeconfig }}
+    - uses: ./.github/actions/kubelogout
+      name: 'Logout - Kubernetes'
+      with:
+        kubeconfig: ${{ steps.kubelogin.outputs.kubeconfig }}
