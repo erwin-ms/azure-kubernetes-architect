@@ -51,7 +51,7 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - id: kubelogin
-      name: 'Login to Cluster'
+      name: 'Kubernetes Login'
       uses: ./.github/actions/setup-kubelogin
       with:
         cluster-name: ${{ inputs.cluster-name }}
@@ -93,7 +93,12 @@ jobs:
       run: |
         kustomize build ${{ inputs.overlays }} | envsubst | kubectl apply -f -
 
-    - name: Clear kubelogin
+    - name: 'Kubernetes Logout'
       run: |
         rm ${{ github.workspace }}/${{ steps.kubelogin.outputs.kubeconfig }}
         kubelogin remove-tokens
+
+    # - uses: ./.github/actions/kubelogout
+    #   name: 'Logout Kubernetes'
+    #   with:
+    #     kubeconfig: ${{ github.workspace }}/${{ steps.kubelogin.outputs.kubeconfig }}

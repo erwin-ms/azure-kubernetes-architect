@@ -43,15 +43,15 @@ runs:
       KUBECONFIG: ${{ github.workspace }}/${{ steps.kubeconfig.outputs.location }}
     run: |
       # Fails if it doesn't exist
-      touch ${{ steps.kubeconfig.ouputs.location }}
-      chmod 600 ${{ steps.kubeconfig.ouputs.location }}
+      touch ${{ steps.kubeconfig.outputs.location }}
+      chmod 600 ${{ steps.kubeconfig.outputs.location }}
 
       # Populate kubeconfig
       az aks get-credentials \
         --resource-group ${{ inputs.resource-group }} \
         --name ${{ inputs.cluster-name }} \
         --overwrite-existing \
-        --file ${{ steps.kubeconfig.ouputs.location }}
+        --file ${{ steps.kubeconfig.outputs.location }}
 
       # Pass kubeconfig to kubelogin to access k8s API
       kubelogin convert-kubeconfig -l azurecli

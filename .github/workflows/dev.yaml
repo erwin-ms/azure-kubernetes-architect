@@ -22,16 +22,16 @@ jobs:
     - id: patterns
       uses: ./.github/actions/tag-conventions
 
-  docker:
-    needs: tags
-    uses: ./.github/workflows/job-docker.yaml
-    with:
-      environment: dev
-      dev-tag: ${{ needs.tags.outputs.dev }}
-    secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  # docker:
+  #   needs: tags
+  #   uses: ./.github/workflows/job-docker.yaml
+  #   with:
+  #     environment: dev
+  #     dev-tag: ${{ needs.tags.outputs.dev }}
+  #   secrets:
+  #     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  #     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   deploy:
     needs: tags
