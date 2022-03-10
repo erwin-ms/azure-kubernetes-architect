@@ -29,13 +29,6 @@ on:
       AZURE_SUBSCRIPTION_ID:
         required: true
 
-
-# ===============
-#  Configuration
-# ===============
-# env:
-#   kubeloginVersion: v0.0.11 # https://github.com/Azure/kubelogin/releases
-
 jobs:
   kubectl:
     runs-on: ubuntu-latest
