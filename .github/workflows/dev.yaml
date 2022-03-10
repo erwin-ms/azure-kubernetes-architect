@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - id: determine-tags
-      uses: ./github/actions/determine-tags.yaml
+      uses: ./github/actions/determine-tag
     - run: echo sha ${{ steps.determine-tags.outputs.git-sha }}
     - run: echo dev-tag ${{ steps.determine-tags.outputs.dev-tag }}
     - run: echo staging-tag ${{ steps.determine-tags.outputs.staging-tag }}
