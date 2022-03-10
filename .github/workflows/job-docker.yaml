@@ -10,11 +10,9 @@ on:
         required: true
         type: string
       dev-tag:
-        required: True
         type: string
         default: 'dev-unknown'
       staging-tag:
-        required: true
         type: string
         default: 'staging-unknown'
     secrets:
