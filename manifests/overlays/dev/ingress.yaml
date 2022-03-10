@@ -1,8 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  # annotations:
+  #   kubernetes.io/ingress.class: nginx
   name: aks-architect-ingress
   namespace: aks-architect
+  # labels:
+  #   name: aks-architect-ingress
 spec:
   rules:
   - host: aks-architect.dev.cloudkube.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: aks-architect-service
+            port:
+              number: 80
