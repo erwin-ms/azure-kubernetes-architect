@@ -13,7 +13,13 @@ on:
         required: true
         type: string
       overlays:
-        required: True
+        required: true
+        type: string
+      git-sha:
+        required: true
+        type: string
+      image-tag:
+        required: true
         type: string
     secrets:
       AZURE_CLIENT_ID:
@@ -39,8 +45,8 @@ jobs:
 
     - name: test kustomize
       env:
-        APP_BUILD_SHA: be3996a
-        IMAGE_TAG: dev-be3996a
+        APP_BUILD_SHA: ${{ inputs.git-sha }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
       run: kustomize build ${{ inputs.overlays }} | envsubst
 
     - name: 'Azure Login'

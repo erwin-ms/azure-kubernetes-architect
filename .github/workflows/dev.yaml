@@ -11,38 +11,42 @@ permissions:
   contents: read
 
 jobs:
-  tag-conventions:
+  tags:
     runs-on: ubuntu-latest
     outputs:
-      sha: ${{ steps.determine-tags.outputs.git-sha }}
-      dev: ${{ steps.determine-tags.outputs.dev-tag }}
-      staging: ${{ steps.determine-tags.outputs.staging-tag }}
+      sha: ${{ steps.patterns.outputs.git-sha }}
+      dev: ${{ steps.patterns.outputs.dev-tag }}
+      staging: ${{ steps.patterns.outputs.staging-tag }}
     steps:
     - uses: actions/checkout@v2
-    - id: determine-tags
+    - id: patterns
       uses: ./.github/actions/tag-conventions
     # - run: echo sha ${{ steps.determine-tags.outputs.git-sha }}
     # - run: echo dev-tag ${{ steps.determine-tags.outputs.dev-tag }}
     # - run: echo staging-tag ${{ steps.determine-tags.outputs.staging-tag }}
 
   docker:
-    needs: tag-conventions
+    needs: tags
     uses: ./.github/workflows/job-docker.yaml
     with:
       environment: dev
-      dev-tag: ${{ needs.tag-conventions.outputs.dev }}
+      dev-tag: ${{ needs.tags.outputs.dev }}
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  # deploy:
-  #   uses: ./.github/workflows/job-deploy.yaml
-  #   with:
-  #     environment: dev
-  #     resource-group: cloudkube-dev-r9er-rg
-  #     cluster-name: cloudkube-dev-r9er-cluster
-  #     overlays: ./manifests/overlays/dev
-  #   secrets:
-  #     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  #     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  deploy:
+    needs: tags
+    uses: ./.github/workflows/job-deploy.yaml
+    with:
+      environment: dev
+      git-sha: ${{ needs.tags.outputs.sha }}
+      image-tag: ${{ needs.tags.outputs.dev }}
+      resource-group: cloudkube-dev-r9er-rg
+      cluster-name: cloudkube-dev-r9er-cluster
+      overlays: ./manifests/overlays/dev
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
