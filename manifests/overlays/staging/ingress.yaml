@@ -6,3 +6,12 @@ metadata:
 spec:
   rules:
   - host: aks-architect.staging.cloudkube.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: aks-architect-service
+            port:
+              number: 80
