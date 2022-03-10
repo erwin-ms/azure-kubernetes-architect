@@ -9,6 +9,14 @@ on:
       environment:
         required: true
         type: string
+      dev-tag:
+        required: True
+        type: string
+        default: 'dev-unknown'
+      staging-tag:
+        required: true
+        type: string
+        default: 'staging-unknown'
     secrets:
       AZURE_CLIENT_ID:
         required: true
@@ -23,43 +31,12 @@ on:
 env:
   azureRegistryName: aksarchitect
   imageName: aksarchitect.azurecr.io/frontend
-  devTag: dev
-  stagingTag: staging
 
 jobs:
-
-  # ===============
-  #  Determine Tag
-  # ===============
-  tag-conventions:
-    runs-on: ubuntu-latest
-    outputs:
-      git-sha: ${{ steps.set-tag.outputs.sha }}
-      dev-tag: ${{ steps.set-tag.outputs.dev }}
-      staging-tag: ${{ steps.set-tag.outputs.staging }}
-    steps:
-    - uses: actions/checkout@v2
-
-    - id: git-sha
-      name: save git sha
-      run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-    - id: set-tag
-      name: save dev and staging tag variants
-      run: |
-        echo "::set-output name=sha::${{ env.sha }}"
-        echo "::set-output name=dev::${{ env.imageName }}:${{ env.devTag }}-${{ env.sha }}"
-        echo "::set-output name=staging::${{ env.imageName }}:${{ env.stagingTag }}-${{ env.sha }}"
-
-  # ========================
-  #  Build Image (dev only)
-  # ========================
   build-and-push:
     runs-on: ubuntu-latest
-    needs: tag-conventions
     environment: ${{ inputs.environment }}
     steps:
-    - run: echo "git sha ${{ needs.tag-conventions.outputs.git-sha }}" # Debugging
 
     - uses: actions/checkout@v2
     - name: 'Azure Login'
@@ -72,22 +49,20 @@ jobs:
     - name: 'Container Registry - Login'
       run: az acr login --name ${{ env.azureRegistryName }}
 
-
     # === Build Image (Dev) ===
     - name: 'Docker - Build and Push'
-      if: github.ref == 'refs/heads/main' # DEV branch
+      if: github.ref == 'refs/heads/feat/kustomize' # DEV branch <================ Temp!
       run: |
-        docker build -t ${{ needs.tag-conventions.outputs.dev-tag }} .
-        docker push ${{ needs.tag-conventions.outputs.dev-tag }}
+        docker build -t ${{ inputs.dev-tag }} .
+        docker push ${{ inputs.dev-tag }}
 
     # === Promote Image (Staging) ===
     - name: 'Re-tag to Promote'
       if: github.ref == 'refs/heads/staging' # STAGING branch
       run: |
-        docker pull ${{ needs.tag-conventions.outputs.dev-tag }}
-        docker tag ${{ needs.tag-conventions.outputs.dev-tag }} ${{ needs.tag-conventions.outputs.staging-tag }}
-        docker push ${{ needs.tag-conventions.outputs.staging-tag }}
-
+        docker pull ${{ inputs.dev-tag }}
+        docker tag ${{ inputs.dev-tag }} ${{ inputs.staging-tag }}
+        docker push ${{ inputs.staging-tag }}
 
     - name: 'Docker - Logout'
       run: docker logout
