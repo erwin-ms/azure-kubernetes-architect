@@ -1,10 +1,10 @@
 name: 'Setup Kubelogin'
 description: 'Installs kubeogin tool and converts existing Azure login to kubeconfig'
 inputs:
-  version:
-    description: 'Version of kubelogin to install, e.g. v0.0.11'
-    type: string
-    default: 'v0.0.11'
+  # version:
+  #   description: 'Version of kubelogin to install, e.g. v0.0.11'
+  #   type: string
+  #   default: 'v0.0.11'
   cluster-name:
     desecription: 'Name of AKS cluster resource'
     required: true
@@ -31,9 +31,7 @@ runs:
     name:  Install kubelogin
     shell: bash
     run: |
-      curl -LO "https://github.com/Azure/kubelogin/releases/download/${{ inputs.version }}/kubelogin-linux-amd64.zip"
-      sudo unzip -j "kubelogin-linux-amd64.zip" -d /usr/local/bin
-      rm -f "kubelogin-linux-amd64.zip"
+      az aks install-cli
       kubelogin --version
 
   - id: setup
