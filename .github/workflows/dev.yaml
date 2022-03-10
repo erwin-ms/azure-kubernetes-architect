@@ -11,6 +11,15 @@ permissions:
   contents: read
 
 jobs:
+  tag-patterns:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - id: determine-tags
+      uses: ./github/actions/determine-tags.yaml
+    - run: echo sha ${{ steps.determine-tags.outputs.git-sha }}
+    - run: echo dev-tag ${{ steps.determine-tags.outputs.dev-tag }}
+    - run: echo staging-tag ${{ steps.determine-tags.outputs.staging-tag }}
   # docker:
     # uses: ./.github/workflows/job-docker.yaml
     # with:
@@ -19,14 +28,14 @@ jobs:
     #   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
     #   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
     #   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  deploy:
-    uses: ./.github/workflows/job-deploy.yaml
-    with:
-      environment: dev
-      resource-group: cloudkube-dev-r9er-rg
-      cluster-name: cloudkube-dev-r9er-cluster
-      overlays: ./manifests/overlays/dev
-    secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  # deploy:
+  #   uses: ./.github/workflows/job-deploy.yaml
+  #   with:
+  #     environment: dev
+  #     resource-group: cloudkube-dev-r9er-rg
+  #     cluster-name: cloudkube-dev-r9er-cluster
+  #     overlays: ./manifests/overlays/dev
+  #   secrets:
+  #     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  #     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
