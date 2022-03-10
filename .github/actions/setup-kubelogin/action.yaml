@@ -7,12 +7,12 @@ inputs:
     default: 'v0.0.11'
   cluster-name:
     desecription: 'Name of AKS cluster resource'
-    type: string
     required: true
+    type: string
   resource-group:
     description: 'Resource Group with AKS cluster resource'
-    type: string
     required: true
+    type: string
 outputs:
   kubeconfig:
     description: 'Location of kubeconfig file'
@@ -25,7 +25,7 @@ runs:
     name: kubeconfig location
     shell: bash
     run: |
-      echo "::set-output name=location::.kubeconfig-${{ github.workspace }}/.kubeconfig-${{ inputs.cluster-name }}"
+      echo "::set-output name=location::.kubeconfig-${{ inputs.cluster-name }}"
 
   - id: install
     name:  Install kubelogin

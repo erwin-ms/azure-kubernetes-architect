@@ -53,6 +53,9 @@ jobs:
     - id: kubelogin
       name: 'Login to Cluster'
       uses: ./.github/actions/setup-kubelogin
+      with:
+        cluster-name: ${{ inputs.cluster-name }}
+        resource-group: ${{ inputs.resource-group }}
 
     # - name:  Install kubelogin
     #   run: |
