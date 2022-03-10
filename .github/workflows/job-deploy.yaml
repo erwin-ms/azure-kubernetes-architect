@@ -77,3 +77,8 @@ jobs:
 
         # confirm it works
         kubectl get pods --namespace aks-architect
+
+    - name: clear kubelogin
+      run: |
+        rm ${{ github.workspace }}/.kubeconfig-${{ inputs.cluster-name }}
+        kubelogin remove-tokens
