@@ -1,5 +1,5 @@
 name: 'Setup Kubelogin'
-description: 'Installs kubeogin tool and converts existing Azure login to kubeconfig'
+description: 'Installs kubelogin tool and converts existing Azure login to kubeconfig'
 inputs:
   cluster-name:
     desecription: 'Name of AKS cluster resource'
