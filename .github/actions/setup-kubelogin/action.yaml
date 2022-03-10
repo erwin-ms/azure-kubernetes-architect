@@ -1,0 +1,60 @@
+name: 'Setup Kubelogin'
+description: 'Installs kubeogin tool and converts existing Azure login to kubeconfig'
+inputs:
+  version:
+    description: 'Version of kubelogin to install, e.g. v0.0.11'
+    type: string
+    default: 'v0.0.11'
+  cluster-name:
+    desecription: 'Name of AKS cluster resource'
+    type: string
+    required: true
+  resource-group:
+    description: 'Resource Group with AKS cluster resource'
+    type: string
+    required: true
+outputs:
+  kubeconfig:
+    description: 'Location of kubeconfig file'
+    value: ${{ steps.kubeconfig.outputs.location }}
+
+runs:
+  using: 'composite'
+  steps:
+  - id: kubeconfig
+    name: kubeconfig location
+    shell: bash
+    run: |
+      echo "::set-output name=location::.kubeconfig-${{ github.workspace }}/.kubeconfig-${{ inputs.cluster-name }}"
+
+  - id: install
+    name:  Install kubelogin
+    shell: bash
+    run: |
+      curl -LO "https://github.com/Azure/kubelogin/releases/download/${{ inputs.version }}/kubelogin-linux-amd64.zip"
+      sudo unzip -j "kubelogin-linux-amd64.zip" -d /usr/local/bin
+      rm -f "kubelogin-linux-amd64.zip"
+      kubelogin --version
+
+  - id: setup
+    name: Setup Kubeconfig
+    shell: bash
+    env:
+      KUBECONFIG: ${{ github.workspace }}/${{ steps.kubeconfig.outputs.location }}
+    run: |
+      # Fails if it doesn't exist
+      touch ${{ steps.kubeconfig.ouputs.location }}
+      chmod 600 ${{ steps.kubeconfig.ouputs.location }}
+
+      # Populate kubeconfig
+      az aks get-credentials \
+        --resource-group ${{ inputs.resource-group }} \
+        --name ${{ inputs.cluster-name }} \
+        --overwrite-existing \
+        --file ${{ steps.kubeconfig.ouputs.location }}
+
+      # Pass kubeconfig to kubelogin to access k8s API
+      kubelogin convert-kubeconfig -l azurecli
+
+      # confirm it works (change??)
+      kubectl get pods --all-namespaces
