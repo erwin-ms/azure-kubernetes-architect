@@ -14,14 +14,14 @@ jobs:
   config:
     uses: ./.github/workflows/_config.yaml
 
-  confirm-target:
+  output-vars:
     needs: config
     runs-on: ubuntu-latest
     steps:
-    - run: echo target ${{ needs.config.outputs.target }}
-    - run: echo cluster ${{ needs.config.outputs.cluster }}
-    - run: echo git sha ${{ needs.config.outputs.git-sha }}
-    - run: echo docker tag ${{ needs.config.outputs.docker-tag }}
+    - run: echo "Target Environment - ${{ needs.config.outputs.target }}"
+    - run: echo "AKS cluster - ${{ needs.config.outputs.cluster }}"
+    - run: echo "git sha ${{ needs.config.outputs.git-sha }}"
+    - run: echo "Docker tag ${{ needs.config.outputs.docker-tag }}"
 
   docker:
     needs: config
@@ -54,5 +54,5 @@ jobs:
     needs: [config, docker, deploy]
     uses: ./.github/workflows/_e2e.yaml
     with:
-      url:       "https://${{ needs.config.outputs.hostname }}"
+      url:       ${{ needs.config.outputs.url }}
       build-sha: ${{ needs.config.outputs.git-sha }}
