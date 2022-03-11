@@ -4,19 +4,15 @@ on:
   workflow_call:
     outputs:
       target:
-        name: target
         description: ''
         value: ${{ jobs.which-env.resolved.target }}
       cluster:
-        name: cluster
         description: ''
         value: ${{ jobs.which-env.resolved.cluster }}
       resource-group:
-        name: resource-group
         description: ''
         value: ${{ jobs.which-env.resolved.resource-group }}
       url:
-        name: url
         description: ''
         value: ${{ jobs.which-env.resolved.url }}
 
