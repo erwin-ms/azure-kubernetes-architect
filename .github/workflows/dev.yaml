@@ -10,6 +10,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  devClusterName: 'totally-wrong-answer' # cloudkube-dev-r9er-cluster
+
 jobs:
   which-env:
     runs-on: ubuntu-latest
@@ -24,7 +27,7 @@ jobs:
       shell: bash
       run: |
         echo "target=dev" >> $GITHUB_ENV
-        echo "cluster=cloudkube-dev-r9er-cluster" >> $GITHUB_ENV
+        echo "cluster=${{ env.devClusterName }}" >> $GITHUB_ENV
         echo "rg=cloudkube-dev-r9er-rg" >> $GITHUB_ENV
         echo "url='https://aks-architect.dev.cloudkube.io/'" >> $GITHUB_ENV
 
@@ -75,10 +78,11 @@ jobs:
   #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   foo:
-    needs: [tags]
+    needs: [tags, which-env]
     runs-on: ubuntu-latest
     steps:
     - run: echo ${{ needs.tags.outputs.foo }}
+    - run: echo ${{ needs.which-env.outputs.cluster }}
 
   # e2e:
   #   needs: [tags, deploy]
