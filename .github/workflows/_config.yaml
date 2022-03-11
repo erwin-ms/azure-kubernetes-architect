@@ -11,16 +11,16 @@ on:
     outputs:
       target:
         description: ''
-        value: ${{ jobs.which-env.outputs.target }}
+        value: ${{ jobs.setup-variables.outputs.target }}
       cluster:
         description: ''
-        value: ${{ jobs.which-env.outputs.cluster }}
+        value: ${{ jobs.setup-variables.outputs.cluster }}
       resource-group:
         description: ''
-        value: ${{ jobs.which-env.outputs.resource-group }}
+        value: ${{ jobs.setup-variables.outputs.resource-group }}
       url:
         description: ''
-        value: ${{ jobs.which-env.outputs.url }}
+        value: ${{ jobs.setup-variables.outputs.url }}
 
 jobs:
   setup-variables:
