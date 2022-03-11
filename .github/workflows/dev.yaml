@@ -10,43 +10,15 @@ permissions:
   id-token: write
   contents: read
 
-# env:
-#   devClusterName: 'totally-wrong-answer' # cloudkube-dev-r9er-cluster
-
 jobs:
-  which-env:
+  config:
     uses: ./.github/workflows/_config.yaml
-    # runs-on: ubuntu-latest
-    # outputs:
-    #   target:         ${{ steps.resolved.outputs.target }}
-    #   cluster:        ${{ steps.resolved.outputs.cluster }}
-    #   resource-group: ${{ steps.resolved.outputs.resource-group }}
-    #   url:            ${{ steps.resolved.outputs.url }}
-    # steps:
-    # - id: is-dev
-    #   if: github.ref == 'refs/heads/feat/kustomize'
-    #   shell: bash
-    #   run: |
-    #     echo "target=dev" >> $GITHUB_ENV
-    #     echo "cluster=${{ env.devClusterName }}" >> $GITHUB_ENV
-    #     echo "rg=cloudkube-dev-r9er-rg" >> $GITHUB_ENV
-    #     echo "url='https://aks-architect.dev.cloudkube.io/'" >> $GITHUB_ENV
-
-    # - id: resolved
-    #   shell: bash
-    #   run: |
-    #     echo "::set-output name=target::${{ env.target }}"
-    #     echo "::set-output name=cluster::${{ env.cluster }}"
-    #     echo "::set-output name=resource-group::${{ env.rg }}"
-    #     echo "::set-output name=url::${{ env.url }}"
-
 
   foo:
-    needs: which-env
+    needs: config
     runs-on: ubuntu-latest
     steps:
-    - run: echo ${{ needs.which-env.outputs.cluster }}
-
+    - run: echo ${{ needs.config.outputs.cluster }}
 
   # tags:
   #   runs-on: ubuntu-latest

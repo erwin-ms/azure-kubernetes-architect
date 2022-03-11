@@ -1,13 +1,10 @@
-name: setup-config
-
+name: config
 
 # CONFIG GOES HERE
 env:
-  devClusterName: 'cloudkube-dev-r9er' # cloudkube-dev-r9er-cluster
-  devRgName: 'cloudkube-dev-r9er-rg'
-  devUrl: 'https://aks-architect.dev.cloudkube.io/'
-
-
+  dev-cluster-name: 'cloudkube-dev-r9er' # cloudkube-dev-r9er-cluster
+  dev-resource-group: 'cloudkube-dev-r9er-rg'
+  dev-url: 'https://aks-architect.dev.cloudkube.io/'
 
 on:
   workflow_call:
@@ -25,9 +22,8 @@ on:
         description: ''
         value: ${{ jobs.which-env.outputs.url }}
 
-
 jobs:
-  which-env:
+  setup-variables:
     runs-on: ubuntu-latest
     outputs:
       target:         ${{ steps.resolved.outputs.target }}
@@ -37,13 +33,13 @@ jobs:
 
     steps:
     - id: is-dev
-      if: github.ref == 'refs/heads/feat/kustomize'
+      if: github.ref == 'refs/heads/feat/kustomize' # <==== CONFIGURE
       shell: bash
       run: |
         echo "target=dev" >> $GITHUB_ENV
-        echo "cluster=${{ env.devClusterName }}" >> $GITHUB_ENV
-        echo "rg=${{ env.devRgName }}" >> $GITHUB_ENV
-        echo "url=${{ env.devUrl }}" >> $GITHUB_ENV
+        echo "cluster=${{ env.dev-cluster-name }}" >> $GITHUB_ENV
+        echo "rg=${{ env.dev-resource-group }}" >> $GITHUB_ENV
+        echo "url=${{ env.dev-url }}" >> $GITHUB_ENV
 
     - id: resolved
       shell: bash
