@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   which-env:
-  uses: ./.github/workflows/_config.yaml
+    uses: ./.github/workflows/_config.yaml
     # runs-on: ubuntu-latest
     # outputs:
     #   target:         ${{ steps.resolved.outputs.target }}
