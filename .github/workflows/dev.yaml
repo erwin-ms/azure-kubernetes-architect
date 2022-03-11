@@ -11,6 +11,31 @@ permissions:
   contents: read
 
 jobs:
+  which-env:
+    runs-on: ubuntu-latest
+    outputs:
+      name:           ${{ steps.resolved.outputs.name }}
+      cluster:        ${{ steps.resolved.outputs.cluster }}
+      resource-group: ${{ steps.resolved.outputs.resource-group }}
+      url:            ${{ steps.resolved.outputs.url }}
+    steps:
+    - id: is-dev
+      if: github.ref == 'refs/heads/feat/kustomize'
+      shell: bash
+      run: |
+        echo "name=dev" >> $GITHUB_ENV
+        echo "cluster=cloudkube-dev-r9er-cluster" >> $GITHUB_ENV
+        echo "rg=cloudkube-dev-r9er-rg" >> $GITHUB_ENV
+        echo "url='https://aks-architect.dev.cloudkube.io/'" >> $GITHUB_ENV
+
+    - id: resolved
+      shell: bash
+      run: |
+        echo "::set-output name=name::${{ env.name }}"
+        echo "::set-output name=cluster::${{ env.cluster }}"
+        echo "::set-output name=resource-group::${{ env.rg }}"
+        echo "::set-output name=url::${{ env.url }}"
+
   tags:
     runs-on: ubuntu-latest
     outputs:
@@ -34,42 +59,42 @@ jobs:
   #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   deploy:
-    needs: tags
+    needs: [tags, which-env]
     uses: ./.github/workflows/job-deploy.yaml
     with:
       environment:    dev                           # Configure
       git-sha:        ${{ needs.tags.outputs.sha }}
       image-tag:      ${{ needs.tags.outputs.dev }} # Configure
-      resource-group: cloudkube-dev-r9er-rg         # Configure
-      cluster-name:   cloudkube-dev-r9er-cluster    # Configure
+      resource-group: ${{ needs.which-env.outputs.resource-group }}         # Configure
+      cluster-name:   ${{ needs.which-env.outputs.cluster }}    # Configure
       overlays:       ./manifests/overlays/dev      # Configure
     secrets:
       AZURE_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  e2e:
-    needs: [tags, deploy]
-    runs-on: ubuntu-latest
-    env:
-      SELENIUM_TARGET_URL: 'https://aks-architect.dev.cloudkube.io/'  # Configure
-      APP_BUILD_SHA: ${{ needs.tags.outputs.sha }}
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-    - run: |
-        npm ci
-        npm install chromedriver --chromedriver_version=LATEST
+  # e2e:
+  #   needs: [tags, deploy]
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     SELENIUM_TARGET_URL: 'https://aks-architect.dev.cloudkube.io/'  # Configure
+  #     APP_BUILD_SHA: ${{ needs.tags.outputs.sha }}
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: actions/setup-node@v2
+  #     with:
+  #       node-version: '16'
+  #   - run: |
+  #       npm ci
+  #       npm install chromedriver --chromedriver_version=LATEST
 
-    - name: 'E2E Tests - first attempt'
-      run: npm run confirm-deployment
-      continue-on-error: true
+  #   - name: 'E2E Tests - first attempt'
+  #     run: npm run confirm-deployment
+  #     continue-on-error: true
 
-    - name: 'E2E Tests - second attempt'
-      run: npm run confirm-deployment
-      continue-on-error: true
+  #   - name: 'E2E Tests - second attempt'
+  #     run: npm run confirm-deployment
+  #     continue-on-error: true
 
-    - name: "Allow failures because GitHub does not support 'warn' builds."
-      run: true
+  #   - name: "Allow failures because GitHub does not support 'warn' builds."
+  #     run: true
