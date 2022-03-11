@@ -14,8 +14,8 @@ jobs:
   tags:
     runs-on: ubuntu-latest
     outputs:
-      sha: ${{ steps.patterns.outputs.git-sha }}
-      dev: ${{ steps.patterns.outputs.dev-tag }}
+      sha:     ${{ steps.patterns.outputs.git-sha }}
+      dev:     ${{ steps.patterns.outputs.dev-tag }}
       staging: ${{ steps.patterns.outputs.staging-tag }}
     steps:
     - uses: actions/checkout@v2
@@ -37,22 +37,22 @@ jobs:
     needs: tags
     uses: ./.github/workflows/job-deploy.yaml
     with:
-      environment: dev
-      git-sha: ${{ needs.tags.outputs.sha }}
-      image-tag: ${{ needs.tags.outputs.dev }}
-      resource-group: cloudkube-dev-r9er-rg
-      cluster-name:   cloudkube-dev-r9er-cluster
-      overlays: ./manifests/overlays/dev
+      environment:    dev                           # Configure
+      git-sha:        ${{ needs.tags.outputs.sha }}
+      image-tag:      ${{ needs.tags.outputs.dev }} # Configure
+      resource-group: cloudkube-dev-r9er-rg         # Configure
+      cluster-name:   cloudkube-dev-r9er-cluster    # Configure
+      overlays:       ./manifests/overlays/dev      # Configure
     secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   e2e:
     needs: [tags, deploy]
     runs-on: ubuntu-latest
     env:
-      SELENIUM_TARGET_URL: 'https://aks-architect.dev.cloudkube.io/'
+      SELENIUM_TARGET_URL: 'https://aks-architect.dev.cloudkube.io/'  # Configure
       APP_BUILD_SHA: ${{ needs.tags.outputs.sha }}
     steps:
     - uses: actions/checkout@v2
@@ -65,5 +65,6 @@ jobs:
     - run: npm run confirm-deployment
       continue-on-error: true
     - run: npm run confirm-deployment
+      continue-on-error: true
     - name: "Allow failures because GitHub does not support 'warn' builds."
       run: true
