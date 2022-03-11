@@ -11,8 +11,6 @@ permissions:
   contents: read
 
 env:
-  cluster:        cloudkube-dev-r9er-cluster
-  resource-group: cloudkube-dev-r9er-rg
   deployment-url: 'https://aks-architect.dev.cloudkube.io/'
 
 jobs:
@@ -45,8 +43,8 @@ jobs:
       environment: dev
       git-sha: ${{ needs.tags.outputs.sha }}
       image-tag: ${{ needs.tags.outputs.dev }}
-      resource-group: ${{ env.resource-group }}
-      cluster-name: ${{ env.cluster }}
+      resource-group: cloudkube-dev-r9er-rg
+      cluster-name:   cloudkube-dev-r9er-cluster
       overlays: ./manifests/overlays/dev
     secrets:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
