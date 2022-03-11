@@ -23,18 +23,6 @@ jobs:
     - run: echo git sha ${{ needs.config.outputs.git-sha }}
     - run: echo docker tag ${{ needs.config.outputs.docker-tag }}
 
-  # tags:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     sha:     ${{ steps.patterns.outputs.git-sha }}
-  #     dev:     ${{ steps.patterns.outputs.dev-tag }}
-  #     staging: ${{ steps.patterns.outputs.staging-tag }}
-  #     foo: ${{ steps.patterns.outputs.foo }}
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - id: patterns
-  #     uses: ./.github/actions/tag-conventions
-
   docker:
     needs: config
     uses: ./.github/workflows/_docker.yaml
@@ -61,6 +49,12 @@ jobs:
       AZURE_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+  e2e:
+    needs: [config, docker, deploy]
+    uses: ./.github/workflows/_e2e.yaml
+    with:
+      url:       ${{ needs.config.outputs.url }}
+      build-sha: ${{ needs.config.outputs.git-sha }}
   # e2e:
   #   needs: [tags, deploy]
   #   runs-on: ubuntu-latest
