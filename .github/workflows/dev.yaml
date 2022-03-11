@@ -14,7 +14,7 @@ jobs:
   which-env:
     runs-on: ubuntu-latest
     outputs:
-      name:           ${{ steps.resolved.outputs.name }}
+      target:           ${{ steps.resolved.outputs.target }}
       cluster:        ${{ steps.resolved.outputs.cluster }}
       resource-group: ${{ steps.resolved.outputs.resource-group }}
       url:            ${{ steps.resolved.outputs.url }}
@@ -23,7 +23,7 @@ jobs:
       if: github.ref == 'refs/heads/feat/kustomize'
       shell: bash
       run: |
-        echo "name=dev" >> $GITHUB_ENV
+        echo "target=dev" >> $GITHUB_ENV
         echo "cluster=cloudkube-dev-r9er-cluster" >> $GITHUB_ENV
         echo "rg=cloudkube-dev-r9er-rg" >> $GITHUB_ENV
         echo "url='https://aks-architect.dev.cloudkube.io/'" >> $GITHUB_ENV
@@ -31,7 +31,7 @@ jobs:
     - id: resolved
       shell: bash
       run: |
-        echo "::set-output name=name::${{ env.name }}"
+        echo "::set-output name=target::${{ env.target }}"
         echo "::set-output name=cluster::${{ env.cluster }}"
         echo "::set-output name=resource-group::${{ env.rg }}"
         echo "::set-output name=url::${{ env.url }}"
@@ -62,12 +62,12 @@ jobs:
     needs: [tags, which-env]
     uses: ./.github/workflows/job-deploy.yaml
     with:
-      environment:    dev                           # Configure
+      environment:     ${{ needs.which-env.outputs.target }}                           # Configure
       git-sha:        ${{ needs.tags.outputs.sha }}
       image-tag:      ${{ needs.tags.outputs.dev }} # Configure
       resource-group: ${{ needs.which-env.outputs.resource-group }}         # Configure
       cluster-name:   ${{ needs.which-env.outputs.cluster }}    # Configure
-      overlays:       ./manifests/overlays/dev      # Configure
+      overlays:       ./manifests/overlays/${{ needs.which-env.outputs.target }}       # Configure
     secrets:
       AZURE_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
