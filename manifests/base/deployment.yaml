@@ -24,7 +24,7 @@ spec:
             app: aks-architect-nuxtjs
       containers:
       - name: aks-architect-nuxtjs
-        image: aksarchitect.azurecr.io/aks-archtitect:${IMAGE_TAG}
+        image: aksarchitect.azurecr.io/frontend:${IMAGE_TAG}
         ports:
         - containerPort: 80
         env:
