@@ -2,6 +2,8 @@ name: config
 
 # CONFIG GOES HERE
 env:
+  staging-tag: staging
+  dev-tag: dev
   dev-cluster-name: 'cloudkube-dev-r9er' # cloudkube-dev-r9er-cluster
   dev-resource-group: 'cloudkube-dev-r9er-rg'
   dev-url: 'https://aks-architect.dev.cloudkube.io/'
@@ -21,6 +23,15 @@ on:
       url:
         description: ''
         value: ${{ jobs.setup-variables.outputs.url }}
+      git-sha:
+        description: 'Short version of current git sha'
+        value: ${{ jobs.determine-tags.outputs.sha }}
+      dev-tag:
+        description: 'Dev Tag'
+        value: ${{ jobs.determine-tags.outputs.dev }}
+      staging-tag:
+        description: 'Staging Tag'
+        value: ${{ jobs.determine-tags.outputs.staging }}
 
 jobs:
   setup-variables:
@@ -34,7 +45,6 @@ jobs:
     steps:
     - id: is-dev
       if: github.ref == 'refs/heads/feat/kustomize' # <==== CONFIGURE
-      shell: bash
       run: |
         echo "target=dev" >> $GITHUB_ENV
         echo "cluster=${{ env.dev-cluster-name }}" >> $GITHUB_ENV
@@ -42,9 +52,27 @@ jobs:
         echo "url=${{ env.dev-url }}" >> $GITHUB_ENV
 
     - id: resolved
-      shell: bash
       run: |
         echo "::set-output name=target::${{ env.target }}"
         echo "::set-output name=cluster::${{ env.cluster }}"
         echo "::set-output name=resource-group::${{ env.rg }}"
         echo "::set-output name=url::${{ env.url }}"
+
+  determine-tags:
+    runs-on: ubuntu-latest
+    outputs:
+      sha:     ${{ steps.resolved.outputs.sha }}
+      dev:     ${{ steps.resolved.outputs.dev }}
+      staging: ${{ steps.resolved.outputs.staging }}
+    steps:
+    - uses: actions/checkout@v2
+    - id: git-sha
+      name: save git sha
+      run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+    - id: resolved
+      name: save dev and staging tag variants
+      run: |
+        echo "::set-output name=sha::${{ env.sha }}"
+        echo "::set-output name=dev::${{ env.dev-tag }}-${{ env.sha }}"
+        echo "::set-output name=staging::${{ env.staging-tag }}-${{ env.sha }}"

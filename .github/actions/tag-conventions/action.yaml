@@ -10,9 +10,6 @@ inputs:
     required: true
     default: 'staging'
 outputs:
-  foo:
-    description: 'testing'
-    value: ${{ steps.set-tag.outputs.foo }}
   git-sha:
     description: 'Short version of current git sha'
     value: ${{ steps.set-tag.outputs.sha }}
@@ -24,9 +21,6 @@ outputs:
     value: ${{ steps.set-tag.outputs.staging }}
   # TODO - production?
 
-env:
-  testVar: 'foobar'
-
 runs:
   using: 'composite'
   steps:
@@ -34,12 +28,6 @@ runs:
     name: save git sha
     shell: bash
     run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-
-  - id: test-branch
-    if: github.ref == 'refs/heads/feat/kustomize'
-    shell: bash
-    run: echo "foo=${{ env.testVar }}" >> $GITHUB_ENV
 
   - id: set-tag
     name: save dev and staging tag variants

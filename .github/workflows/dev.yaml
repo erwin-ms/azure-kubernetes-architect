@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: echo ${{ needs.config.outputs.cluster }}
+    - run: echo ${{ needs.config.outputs.git-sha }}
+    - run: echo ${{ needs.config.outputs.dev-tag }}
+    - run: echo ${{ needs.config.outputs.staging-tag }}
 
   # tags:
   #   runs-on: ubuntu-latest
