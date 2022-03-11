@@ -31,7 +31,7 @@ spec:
         - name: PORT
           value: "3000"
         - name: APP_BUILD_SHA
-          value: ${APP_BUILD_SHA}
+          value: ${APP_BUILD_SHA} # edge case: if git sha is all numbers, this will fail.
         - name: NODE_ENV
           value: production
         resources:

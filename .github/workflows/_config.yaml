@@ -5,10 +5,12 @@ env:
   dev-cluster:            cloudkube-dev-r9er-cluster
   dev-resource-group:     cloudkube-dev-r9er-rg
   dev-url:                'https://aks-architect.dev.cloudkube.io/'
+  dev-hostname:           aks-architect.dev.cloudkube.io
 
   staging-cluster:        cloudkube-staging-d7c-cluster
   staging-resource-group: cloudkube-staging-d7c-rg
   staging-url:           'https://aks-architect.staging.cloudkube.io/'
+  staging-hostname:       aks-architect.staging.cloudkube.io
 
 
 on:
@@ -26,6 +28,9 @@ on:
       url:
         description: ''
         value: ${{ jobs.setup-variables.outputs.url }}
+      hostname:
+        description: 'for ingress'
+        value: ${{ jobs.setup-variables.outputs.hotsname }}
       git-sha:
         description: 'Short version of current git sha'
         value: ${{ jobs.setup-variables.outputs.git-sha }}
@@ -42,6 +47,7 @@ jobs:
       cluster:        ${{ steps.resolved.outputs.cluster }}
       resource-group: ${{ steps.resolved.outputs.resource-group }}
       url:            ${{ steps.resolved.outputs.url }}
+      hostname:       ${{ steps.resolved.outputs.hostname
       git-sha:        ${{ steps.resolved.outputs.git-sha }}
       docker-tag:     ${{ steps.resolved.outputs.docker-tag }}
 
@@ -58,6 +64,7 @@ jobs:
         echo "cluster=${{ env.dev-cluster }}" >> $GITHUB_ENV
         echo "rg=${{ env.dev-resource-group }}" >> $GITHUB_ENV
         echo "url=${{ env.dev-url }}" >> $GITHUB_ENV
+        echo "hostname=${{ env.dev-hostname }}" >> $GITHUB_ENV
         echo "docker-tag=dev-${{ env.git-sha }}" >> $GITHUB_ENV
 
     - id: is-staging
@@ -67,6 +74,7 @@ jobs:
         echo "cluster=${{ env.staging-cluster }}" >> $GITHUB_ENV
         echo "rg=${{ env.staging-resource-group }}" >> $GITHUB_ENV
         echo "url=${{ env.staging-url }}" >> $GITHUB_ENV
+        echo "hostname=${{ env.staging-hostname }}" >> $GITHUB_ENV
         echo "docker-tag=staging-${{ env.git-sha }}" >> $GITHUB_ENV
 
     - id: resolved
@@ -76,4 +84,5 @@ jobs:
         echo "::set-output name=resource-group::${{ env.rg }}"
         echo "::set-output name=docker-tag::${{ env.docker-tag }}"
         echo "::set-output name=url::${{ env.url }}"
+        echo "::set-output name=hostname::${{ env.hostname }}"
         echo "::set-output name=git-sha::${{ env.git-sha }}"

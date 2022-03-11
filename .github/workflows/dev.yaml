@@ -54,6 +54,7 @@ jobs:
     uses: ./.github/workflows/_e2e.yaml
     with:
       url:       ${{ needs.config.outputs.url }}
+      hostname:  ${{ needs.config.outputs.hostname }}
       build-sha: ${{ needs.config.outputs.git-sha }}
   # e2e:
   #   needs: [tags, deploy]
