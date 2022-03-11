@@ -62,9 +62,14 @@ jobs:
     - run: |
         npm ci
         npm install chromedriver --chromedriver_version=LATEST
-    - run: npm run confirm-deployment
+
+    - name: 'E2E Tests - first attempt'
+      run: npm run confirm-deployment
       continue-on-error: true
-    - run: npm run confirm-deployment
+
+    - name: 'E2E Tests - second attempt'
+      run: npm run confirm-deployment
       continue-on-error: true
+
     - name: "Allow failures because GitHub does not support 'warn' builds."
       run: true
