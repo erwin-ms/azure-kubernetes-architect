@@ -17,19 +17,19 @@ on:
   workflow_call:
     outputs:
       target:
-        description: ''
+        description: 'Deployment target, e.g. dev, staging or production'
         value: ${{ jobs.setup-variables.outputs.target }}
       cluster:
-        description: ''
+        description: 'Name of AKS Cluster resource'
         value: ${{ jobs.setup-variables.outputs.cluster }}
       resource-group:
-        description: ''
+        description: 'Name of resource group that AKS cluster belongs to, i.e. not the managed group.'
         value: ${{ jobs.setup-variables.outputs.resource-group }}
       url:
-        description: ''
+        description: 'The URL used for e2e testing'
         value: ${{ jobs.setup-variables.outputs.url }}
       hostname:
-        description: 'for ingress'
+        description: 'Hostname for ingress configuration'
         value: ${{ jobs.setup-variables.outputs.hotsname }}
       git-sha:
         description: 'Short version of current git sha'
