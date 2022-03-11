@@ -79,7 +79,7 @@ jobs:
   #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   foo:
-    needs: [tags, which-env]
+    needs: [which-env]
     runs-on: ubuntu-latest
     steps:
     - run: echo ${{ needs.tags.outputs.foo }}
