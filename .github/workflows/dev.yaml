@@ -56,28 +56,3 @@ jobs:
     with:
       url:       ${{ needs.config.outputs.url }}
       build-sha: ${{ needs.config.outputs.git-sha }}
-  # e2e:
-  #   needs: [tags, deploy]
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     SELENIUM_TARGET_URL: 'https://aks-architect.dev.cloudkube.io/'  # Configure
-  #     APP_BUILD_SHA: ${{ needs.tags.outputs.sha }}
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - uses: actions/setup-node@v2
-  #     with:
-  #       node-version: '16'
-  #   - run: |
-  #       npm ci
-  #       npm install chromedriver --chromedriver_version=LATEST
-
-  #   - name: 'E2E Tests - first attempt'
-  #     run: npm run confirm-deployment
-  #     continue-on-error: true
-
-  #   - name: 'E2E Tests - second attempt'
-  #     run: npm run confirm-deployment
-  #     continue-on-error: true
-
-  #   - name: "Allow failures because GitHub does not support 'warn' builds."
-  #     run: true
