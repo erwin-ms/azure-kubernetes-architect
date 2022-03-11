@@ -25,11 +25,13 @@ jobs:
         npm ci
         npm install chromedriver --chromedriver_version=LATEST
 
-    - name: 'E2E Tests - first attempt'
+    - id: first-try
+      name: 'E2E Tests - first attempt'
       run: npm run confirm-deployment
       continue-on-error: true
 
-    - name: 'E2E Tests - second attempt'
+    - id: second-try
+      name: 'E2E Tests - second attempt'
       run: npm run confirm-deployment
       continue-on-error: true
 
