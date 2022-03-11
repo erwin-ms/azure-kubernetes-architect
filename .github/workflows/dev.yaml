@@ -14,14 +14,14 @@ jobs:
   config:
     uses: ./.github/workflows/_config.yaml
 
-  foo:
-    needs: config
-    runs-on: ubuntu-latest
-    steps:
-    - run: echo ${{ needs.config.outputs.cluster }}
-    - run: echo ${{ needs.config.outputs.git-sha }}
-    - run: echo ${{ needs.config.outputs.dev-tag }}
-    - run: echo ${{ needs.config.outputs.staging-tag }}
+  # foo:
+  #   needs: config
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - run: echo ${{ needs.config.outputs.cluster }}
+  #   - run: echo ${{ needs.config.outputs.git-sha }}
+  #   - run: echo ${{ needs.config.outputs.dev-tag }}
+  #   - run: echo ${{ needs.config.outputs.staging-tag }}
 
   # tags:
   #   runs-on: ubuntu-latest
@@ -35,31 +35,31 @@ jobs:
   #   - id: patterns
   #     uses: ./.github/actions/tag-conventions
 
-  # docker:
-  #   needs: tags
-  #   uses: ./.github/workflows/job-docker.yaml
-  #   with:
-  #     environment: dev
-  #     dev-tag: ${{ needs.tags.outputs.dev }}
-  #   secrets:
-  #     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  #     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  docker:
+    needs: config
+    uses: ./.github/workflows/job-docker.yaml
+    with:
+      environment: ${{ needs.config.outputs.target }}
+      dev-tag: ${{ needs.config.outputs.docker-tag }}
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  # deploy:
-  #   needs: [tags, which-env]
-  #   uses: ./.github/workflows/job-deploy.yaml
-  #   with:
-  #     environment:     ${{ needs.which-env.outputs.target }}                           # Configure
-  #     git-sha:        ${{ needs.tags.outputs.sha }}
-  #     image-tag:      ${{ needs.tags.outputs.dev }} # Configure
-  #     resource-group: ${{ needs.which-env.outputs.resource-group }}         # Configure
-  #     cluster-name:   ${{ needs.which-env.outputs.cluster }}    # Configure
-  #     overlays:       ./manifests/overlays/${{ needs.which-env.outputs.target }}       # Configure
-  #   secrets:
-  #     AZURE_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
-  #     AZURE_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
-  #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  deploy:
+    needs: config
+    uses: ./.github/workflows/job-deploy.yaml
+    with:
+      environment:    ${{ needs.config.outputs.target }}
+      git-sha:        ${{ needs.config.outputs.sha }}
+      image-tag:      ${{ needs.config.outputs.dev }}
+      resource-group: ${{ needs.config.outputs.resource-group }}
+      cluster-name:   ${{ needs.config.outputs.cluster }}
+      overlays:       ./manifests/overlays/${{ needs.config.outputs.target }}
+    secrets:
+      AZURE_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   # e2e:
   #   needs: [tags, deploy]

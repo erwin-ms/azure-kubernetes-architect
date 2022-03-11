@@ -2,11 +2,14 @@ name: config
 
 # CONFIG GOES HERE
 env:
-  staging-tag: staging
-  dev-tag: dev
-  dev-cluster-name: 'cloudkube-dev-r9er' # cloudkube-dev-r9er-cluster
-  dev-resource-group: 'cloudkube-dev-r9er-rg'
-  dev-url: 'https://aks-architect.dev.cloudkube.io/'
+  dev-cluster:            cloudkube-dev-r9er-cluster
+  dev-resource-group:     cloudkube-dev-r9er-rg
+  dev-url:                'https://aks-architect.dev.cloudkube.io/'
+
+  staging-cluster:        cloudkube-staging-d7c-cluster
+  staging-resource-group: cloudkube-staging-d7c-rg
+  staging-url:           'https://aks-architect.staging.cloudkube.io/'
+
 
 on:
   workflow_call:
@@ -34,30 +37,6 @@ on:
         value: ${{ jobs.determine-tags.outputs.staging }}
 
 jobs:
-  setup-variables:
-    runs-on: ubuntu-latest
-    outputs:
-      target:         ${{ steps.resolved.outputs.target }}
-      cluster:        ${{ steps.resolved.outputs.cluster }}
-      resource-group: ${{ steps.resolved.outputs.resource-group }}
-      url:            ${{ steps.resolved.outputs.url }}
-
-    steps:
-    - id: is-dev
-      if: github.ref == 'refs/heads/feat/kustomize' # <==== CONFIGURE
-      run: |
-        echo "target=dev" >> $GITHUB_ENV
-        echo "cluster=${{ env.dev-cluster-name }}" >> $GITHUB_ENV
-        echo "rg=${{ env.dev-resource-group }}" >> $GITHUB_ENV
-        echo "url=${{ env.dev-url }}" >> $GITHUB_ENV
-
-    - id: resolved
-      run: |
-        echo "::set-output name=target::${{ env.target }}"
-        echo "::set-output name=cluster::${{ env.cluster }}"
-        echo "::set-output name=resource-group::${{ env.rg }}"
-        echo "::set-output name=url::${{ env.url }}"
-
   determine-tags:
     runs-on: ubuntu-latest
     outputs:
@@ -74,5 +53,42 @@ jobs:
       name: save dev and staging tag variants
       run: |
         echo "::set-output name=sha::${{ env.sha }}"
-        echo "::set-output name=dev::${{ env.dev-tag }}-${{ env.sha }}"
-        echo "::set-output name=staging::${{ env.staging-tag }}-${{ env.sha }}"
+        echo "::set-output name=dev::dev-${{ env.sha }}"
+        echo "::set-output name=staging::staging-${{ env.sha }}"
+
+  setup-variables:
+    needs: determine-tags
+    runs-on: ubuntu-latest
+    outputs:
+      target:         ${{ steps.resolved.outputs.target }}
+      cluster:        ${{ steps.resolved.outputs.cluster }}
+      resource-group: ${{ steps.resolved.outputs.resource-group }}
+      docker-tag:     ${{ steps.resolved.outputs.docker-tag }}
+      url:            ${{ steps.resolved.outputs.url }}
+
+    steps:
+    - id: is-dev
+      if: github.ref == 'refs/heads/feat/kustomize' # <=== CONFIGURE branch name
+      run: |
+        echo "target=dev" >> $GITHUB_ENV
+        echo "cluster=${{ env.dev-cluster }}" >> $GITHUB_ENV
+        echo "rg=${{ env.dev-resource-group }}" >> $GITHUB_ENV
+        echo "docker-tag=${{ needs.determine-tags.outputs.dev }}" >> $GITHUB_ENV
+        echo "url=${{ env.dev-url }}" >> $GITHUB_ENV
+
+    - id: is-staging
+      if: github.ref == 'refs/heads/staging' # <=== CONFIGURE branch name
+      run: |
+        echo "target=staging" >> $GITHUB_ENV
+        echo "cluster=${{ env.staging-cluster }}" >> $GITHUB_ENV
+        echo "rg=${{ env.staging-resource-group }}" >> $GITHUB_ENV
+        echo "docker-tag=${{ needs.determine-tags.outputs.staging }}" >> $GITHUB_ENV
+        echo "url=${{ env.staging-url }}" >> $GITHUB_ENV
+
+    - id: resolved
+      run: |
+        echo "::set-output name=target::${{ env.target }}"
+        echo "::set-output name=cluster::${{ env.cluster }}"
+        echo "::set-output name=resource-group::${{ env.rg }}"
+        echo "::set-output name=docker-tag::${{ env.docker-tag }}"
+        echo "::set-output name=url::${{ env.url }}"
