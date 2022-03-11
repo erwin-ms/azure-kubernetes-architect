@@ -1,0 +1,58 @@
+name: setup-config
+
+on:
+  workflow_call:
+    outputs:
+      target:
+        name: target
+        description: ''
+        value: ${{ jobs.which-env.resolved.target }}
+      cluster:
+        name: cluster
+        description: ''
+        value: ${{ jobs.which-env.resolved.cluster }}
+      resource-group:
+        name: resource-group
+        description: ''
+        value: ${{ jobs.which-env.resolved.resource-group }}
+      url:
+        name: url
+        description: ''
+        value: ${{ jobs.which-env.resolved.url }}
+
+
+# CONFIG GOES HERE
+env:
+  devClusterName: 'cloudkube-dev-r9er' # cloudkube-dev-r9er-cluster
+  devRgName: 'cloudkube-dev-r9er-rg'
+  devUrl: 'https://aks-architect.dev.cloudkube.io/'
+
+
+
+
+jobs:
+  which-env:
+    runs-on: ubuntu-latest
+    outputs:
+      target:         ${{ steps.resolved.outputs.target }}
+      cluster:        ${{ steps.resolved.outputs.cluster }}
+      resource-group: ${{ steps.resolved.outputs.resource-group }}
+      url:            ${{ steps.resolved.outputs.url }}
+
+    steps:
+    - id: is-dev
+      if: github.ref == 'refs/heads/feat/kustomize'
+      shell: bash
+      run: |
+        echo "target=dev" >> $GITHUB_ENV
+        echo "cluster=${{ env.devClusterName }}" >> $GITHUB_ENV
+        echo "rg=${{ env.devRgName }}" >> $GITHUB_ENV
+        echo "url=${{ env.devUrl }}" >> $GITHUB_ENV
+
+    - id: resolved
+      shell: bash
+      run: |
+        echo "::set-output name=target::${{ env.target }}"
+        echo "::set-output name=cluster::${{ env.cluster }}"
+        echo "::set-output name=resource-group::${{ env.rg }}"
+        echo "::set-output name=url::${{ env.url }}"
