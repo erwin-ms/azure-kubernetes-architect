@@ -1,5 +1,14 @@
 name: setup-config
 
+
+# CONFIG GOES HERE
+env:
+  devClusterName: 'cloudkube-dev-r9er' # cloudkube-dev-r9er-cluster
+  devRgName: 'cloudkube-dev-r9er-rg'
+  devUrl: 'https://aks-architect.dev.cloudkube.io/'
+
+
+
 on:
   workflow_call:
     outputs:
@@ -15,15 +24,6 @@ on:
       url:
         description: ''
         value: ${{ jobs.which-env.outputs.url }}
-
-
-# CONFIG GOES HERE
-env:
-  devClusterName: 'cloudkube-dev-r9er' # cloudkube-dev-r9er-cluster
-  devRgName: 'cloudkube-dev-r9er-rg'
-  devUrl: 'https://aks-architect.dev.cloudkube.io/'
-
-
 
 
 jobs:
