@@ -39,7 +39,7 @@ runs:
   - id: test-branch
     if: github.ref == 'refs/heads/feat/kustomize'
     shell: bash
-    run: echo "foo=${{ inputs.stagingBase }}" >> $GITHUB_ENV
+    run: echo "foo=${{ env.testVar }}" >> $GITHUB_ENV
 
   - id: set-tag
     name: save dev and staging tag variants

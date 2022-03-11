@@ -78,7 +78,7 @@ jobs:
     needs: [tags]
     runs-on: ubuntu-latest
     steps:
-    - run: ${{ needs.tags.outputs.foo }}
+    - run: echo ${{ needs.tags.outputs.foo }}
 
   # e2e:
   #   needs: [tags, deploy]
