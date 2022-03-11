@@ -36,3 +36,8 @@ runs:
       echo "::set-output name=sha::${{ env.sha }}"
       echo "::set-output name=dev::${{ inputs.devBase }}-${{ env.sha }}"
       echo "::set-output name=staging::${{ inputs.stagingBase }}-${{ env.sha }}"
+
+
+  - id: test-branch
+    if: github.ref == 'refs/heads/feat/kustomize'
+    run: echo "has branch ref"
