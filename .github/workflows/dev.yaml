@@ -36,7 +36,7 @@ jobs:
 
   deploy:
     needs: config
-    uses: ./.github/workflows/job-deploy.yaml
+    uses: ./.github/workflows/_deploy.yaml
     with:
       environment:    ${{ needs.config.outputs.target }}
       git-sha:        ${{ needs.config.outputs.git-sha }}

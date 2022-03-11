@@ -30,7 +30,7 @@ on:
         required: true
 
 jobs:
-  kubectl:
+  kubectl-apply:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
