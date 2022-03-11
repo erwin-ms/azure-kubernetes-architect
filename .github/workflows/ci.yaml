@@ -1,10 +1,16 @@
 name: ci
 
 on:
-  # push:
-  #   branches:
-  #   - main
-  #   - feat/*
+  push:
+    branches:
+    - main
+    - feat/*
+    paths-ignore:
+    - 'content/**'
+    - 'manifests/**'
+    - 'scss/**'
+    - 'static/**'
+    - '*.md'
   pull_request:
     branches:
     - main

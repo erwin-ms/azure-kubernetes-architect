@@ -11,7 +11,7 @@ on:
         type: string
 
 jobs:
-  e2e:
+  confirm-deployed:
     runs-on: ubuntu-latest
     env:
       SELENIUM_TARGET_URL: ${{ inputs.url }}
