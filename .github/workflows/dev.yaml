@@ -54,5 +54,5 @@ jobs:
     needs: [config, docker, deploy]
     uses: ./.github/workflows/_e2e.yaml
     with:
-      url:       ${{ needs.config.outputs.url }}
+      url:       "https://${{ needs.config.outputs.hostname }}"
       build-sha: ${{ needs.config.outputs.git-sha }}
