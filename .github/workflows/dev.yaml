@@ -10,9 +10,6 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  deployment-url: 'https://aks-architect.dev.cloudkube.io/'
-
 jobs:
   tags:
     runs-on: ubuntu-latest
@@ -55,7 +52,7 @@ jobs:
     needs: tags
     runs-on: ubuntu-latest
     env:
-      SELENIUM_TARGET_URL: ${{ env.deployment-url }}
+      SELENIUM_TARGET_URL: 'https://aks-architect.dev.cloudkube.io/'
       APP_BUILD_SHA: ${{ needs.tags.outputs.sha }}
     steps:
     - uses: actions/checkout@v2
