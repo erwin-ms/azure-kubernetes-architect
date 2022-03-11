@@ -9,12 +9,9 @@ on:
       environment:
         required: true
         type: string
-      dev-tag:
+      git-sha:
         type: string
-        default: 'dev-unknown'
-      staging-tag:
-        type: string
-        default: 'staging-unknown'
+        default: 'maybe-should-be-requried'
     secrets:
       AZURE_CLIENT_ID:
         required: true
@@ -28,7 +25,7 @@ on:
 # ===============
 env:
   azureRegistryName: aksarchitect
-  imageName: aksarchitect.azurecr.io/frontend
+  image-name: aksarchitect.azurecr.io/frontend
 
 jobs:
   build-and-push:
@@ -47,20 +44,20 @@ jobs:
     - name: 'Container Registry - Login'
       run: az acr login --name ${{ env.azureRegistryName }}
 
-    # === Build Image (Dev) ===
+    # Build Dev Image
     - name: 'Docker - Build and Push'
-      if: github.ref == 'refs/heads/feat/kustomize' # DEV branch <================ Temp!
+      if: inputs.environment == 'dev'
       run: |
-        docker build -t ${{ env.imageName}}:${{ inputs.dev-tag }} .
-        docker push ${{ env.imageName}}:${{ inputs.dev-tag }}
+        docker build -t ${{ env.image-name }}:dev-${{ inputs.git-sha }} .
+        docker push ${{ env.image-name }}:dev-${{ inputs.git-sha }}
 
-    # === Promote Image (Staging) ===
+    # Promote Dev to Staging
     - name: 'Re-tag to Promote'
-      if: github.ref == 'refs/heads/staging' # STAGING branch
+      if: inputs.environment == 'staging'
       run: |
-        docker pull ${{ env.imageName}}:${{ inputs.dev-tag }}
-        docker tag ${{ env.imageName}}:${{ inputs.dev-tag }} ${{ env.imageName}}:${{ inputs.staging-tag }}
-        docker push ${{ env.imageName}}:${{ inputs.staging-tag }}
+        docker pull ${{ env.image-name }}:dev-${{ inputs.git-sha }}
+        docker tag ${{ env.image-name }}:dev-${{ inputs.git-sha }} ${{ env.image-name }}:staging-${{ inputs.git-sha }}
+        docker push ${{ env.image-name }}:staging-${{ inputs.git-sha }}
 
     - name: 'Docker - Logout'
       run: docker logout

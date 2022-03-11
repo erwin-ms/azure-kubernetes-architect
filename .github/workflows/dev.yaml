@@ -39,11 +39,11 @@ jobs:
     needs: config
     uses: ./.github/workflows/job-docker.yaml
     with:
-      environment: ${{ needs.config.outputs.target }}
-      dev-tag: ${{ needs.config.outputs.docker-tag }}
+      environment:  ${{ needs.config.outputs.target }}
+      git-sha:      ${{ needs.config.outputs.git-sha }}
     secrets:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   deploy:
