@@ -47,7 +47,7 @@ jobs:
       cluster:        ${{ steps.resolved.outputs.cluster }}
       resource-group: ${{ steps.resolved.outputs.resource-group }}
       url:            ${{ steps.resolved.outputs.url }}
-      hostname:       ${{ steps.resolved.outputs.hostname
+      hostname:       ${{ steps.resolved.outputs.hostname }}
       git-sha:        ${{ steps.resolved.outputs.git-sha }}
       docker-tag:     ${{ steps.resolved.outputs.docker-tag }}
 
