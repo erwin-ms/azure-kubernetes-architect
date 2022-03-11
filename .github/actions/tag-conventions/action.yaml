@@ -40,4 +40,5 @@ runs:
 
   - id: test-branch
     if: github.ref == 'refs/heads/feat/kustomize'
+    shell: bash
     run: echo "has branch ref"
