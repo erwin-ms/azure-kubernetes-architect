@@ -43,6 +43,7 @@ jobs:
       image-tag:      ${{ needs.config.outputs.docker-tag }}
       resource-group: ${{ needs.config.outputs.resource-group }}
       cluster-name:   ${{ needs.config.outputs.cluster }}
+      hostname:       ${{ needs.config.outputs.hostname }}
       overlays:       ./manifests/overlays/${{ needs.config.outputs.target }}
     secrets:
       AZURE_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
@@ -54,7 +55,6 @@ jobs:
     uses: ./.github/workflows/_e2e.yaml
     with:
       url:       ${{ needs.config.outputs.url }}
-      hostname:  ${{ needs.config.outputs.hostname }}
       build-sha: ${{ needs.config.outputs.git-sha }}
   # e2e:
   #   needs: [tags, deploy]
