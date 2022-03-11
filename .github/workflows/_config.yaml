@@ -28,53 +28,37 @@ on:
         value: ${{ jobs.setup-variables.outputs.url }}
       git-sha:
         description: 'Short version of current git sha'
-        value: ${{ jobs.determine-tags.outputs.sha }}
-      dev-tag:
-        description: 'Dev Tag'
-        value: ${{ jobs.determine-tags.outputs.dev }}
-      staging-tag:
-        description: 'Staging Tag'
-        value: ${{ jobs.determine-tags.outputs.staging }}
+        value: ${{ jobs.setup-variables.outputs.sha }}
+      docker-tag:
+        description: 'Docker Image Tag'
+        value: ${{ jobs.setup-variables.outputs.docker-tag }}
+
 
 jobs:
-  determine-tags:
-    runs-on: ubuntu-latest
-    outputs:
-      sha:     ${{ steps.resolved.outputs.sha }}
-      dev:     ${{ steps.resolved.outputs.dev }}
-      staging: ${{ steps.resolved.outputs.staging }}
-    steps:
-    - uses: actions/checkout@v2
-    - id: git-sha
-      name: save git sha
-      run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-    - id: resolved
-      name: save dev and staging tag variants
-      run: |
-        echo "::set-output name=sha::${{ env.sha }}"
-        echo "::set-output name=dev::dev-${{ env.sha }}"
-        echo "::set-output name=staging::staging-${{ env.sha }}"
-
   setup-variables:
-    needs: determine-tags
     runs-on: ubuntu-latest
     outputs:
       target:         ${{ steps.resolved.outputs.target }}
       cluster:        ${{ steps.resolved.outputs.cluster }}
       resource-group: ${{ steps.resolved.outputs.resource-group }}
-      docker-tag:     ${{ steps.resolved.outputs.docker-tag }}
       url:            ${{ steps.resolved.outputs.url }}
+      git-sha:        ${{ steps.resolved.outputs.sha }}
+      docker-tag:     ${{ steps.resolved.outputs.docker-tag }}
 
     steps:
+    - uses: actions/checkout@v2
+
+    - name: save git sha
+      run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
     - id: is-dev
       if: github.ref == 'refs/heads/feat/kustomize' # <=== CONFIGURE branch name
       run: |
         echo "target=dev" >> $GITHUB_ENV
         echo "cluster=${{ env.dev-cluster }}" >> $GITHUB_ENV
         echo "rg=${{ env.dev-resource-group }}" >> $GITHUB_ENV
-        echo "docker-tag=${{ needs.determine-tags.outputs.dev }}" >> $GITHUB_ENV
         echo "url=${{ env.dev-url }}" >> $GITHUB_ENV
+        echo "docker-tag=dev-${{ env.sha }}" >> $GITHUB_ENV
 
     - id: is-staging
       if: github.ref == 'refs/heads/staging' # <=== CONFIGURE branch name
@@ -82,8 +66,8 @@ jobs:
         echo "target=staging" >> $GITHUB_ENV
         echo "cluster=${{ env.staging-cluster }}" >> $GITHUB_ENV
         echo "rg=${{ env.staging-resource-group }}" >> $GITHUB_ENV
-        echo "docker-tag=${{ needs.determine-tags.outputs.staging }}" >> $GITHUB_ENV
         echo "url=${{ env.staging-url }}" >> $GITHUB_ENV
+        echo "docker-tag=staging-${{ env.sha }}" >> $GITHUB_ENV
 
     - id: resolved
       run: |
@@ -92,3 +76,4 @@ jobs:
         echo "::set-output name=resource-group::${{ env.rg }}"
         echo "::set-output name=docker-tag::${{ env.docker-tag }}"
         echo "::set-output name=url::${{ env.url }}"
+        echo "::set-output name=sha::${{ env.sha }}"
