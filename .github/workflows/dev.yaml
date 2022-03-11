@@ -49,7 +49,7 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   e2e:
-    needs: tags
+    needs: [tags, deploy]
     runs-on: ubuntu-latest
     env:
       SELENIUM_TARGET_URL: 'https://aks-architect.dev.cloudkube.io/'
@@ -65,3 +65,5 @@ jobs:
     - run: npm run confirm-deployment
       continue-on-error: true
     - run: npm run confirm-deployment
+    - name: "Allow failures because GitHub does not support 'warn' builds."
+      run: true
