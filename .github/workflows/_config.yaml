@@ -5,16 +5,16 @@ on:
     outputs:
       target:
         description: ''
-        value: ${{ jobs.which-env.resolved.target }}
+        value: ${{ jobs.which-env.outputs.target }}
       cluster:
         description: ''
-        value: ${{ jobs.which-env.resolved.cluster }}
+        value: ${{ jobs.which-env.outputs.cluster }}
       resource-group:
         description: ''
-        value: ${{ jobs.which-env.resolved.resource-group }}
+        value: ${{ jobs.which-env.outputs.resource-group }}
       url:
         description: ''
-        value: ${{ jobs.which-env.resolved.url }}
+        value: ${{ jobs.which-env.outputs.url }}
 
 
 # CONFIG GOES HERE

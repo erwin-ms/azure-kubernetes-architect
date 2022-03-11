@@ -40,6 +40,14 @@ jobs:
     #     echo "::set-output name=resource-group::${{ env.rg }}"
     #     echo "::set-output name=url::${{ env.url }}"
 
+
+  foo:
+    needs: which-env
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo ${{ needs.which-env.outputs.cluster }}
+
+
   # tags:
   #   runs-on: ubuntu-latest
   #   outputs:
@@ -77,13 +85,6 @@ jobs:
   #     AZURE_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
   #     AZURE_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
   #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-  foo:
-    needs: [which-env]
-    runs-on: ubuntu-latest
-    steps:
-    - run: echo ${{ needs.tags.outputs.foo }}
-    - run: echo ${{ needs.which-env.outputs.cluster }}
 
   # e2e:
   #   needs: [tags, deploy]
