@@ -5,6 +5,7 @@ on:
     branches:
     - main
     - staging
+    - feat/defender-scan # <==== TEMP
     paths-ignore:
     - 'content/**'
     - 'manifests/**'

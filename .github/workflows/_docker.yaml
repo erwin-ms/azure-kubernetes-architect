@@ -29,10 +29,10 @@ env:
 
 jobs:
   build-and-push:
+    if: inputs.environment == 'dev'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-
     - uses: actions/checkout@v2
     - name: 'Azure Login'
       uses: azure/login@v1
@@ -41,23 +41,54 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: 'Container Registry - Login'
-      run: az acr login --name ${{ env.acr-registry }}
+    - run: az acr login --name ${{ env.acr-registry }}
 
     # Build Dev Image
-    - name: 'Docker - Build and Push'
-      if: inputs.environment == 'dev'
-      run: |
-        docker build -t ${{ env.image-name }}:dev-${{ inputs.git-sha }} .
-        docker push ${{ env.image-name }}:dev-${{ inputs.git-sha }}
+    - name: 'Docker - Build'
+      # if: inputs.environment == 'dev'
+      run: docker build -t ${{ env.image-name }}:dev-${{ inputs.git-sha }} .
+
+    - uses: Azure/container-scan@v0
+      name: 'Docker - Azure Defender Scan'
+      # if: inputs.environment == 'dev'
+      id: container-scan
+      with:
+        image-name: ${{ env.image-name }}:dev-${{ inputs.git-sha }}
+        severity-threshold: WARN
+
+    # Push Dev Image
+    - name: 'Docker - Push'
+      # if: inputs.environment == 'dev'
+      run: docker push ${{ env.image-name }}:dev-${{ inputs.git-sha }}
+
+    - name: Post logs to appinsights
+      uses: Azure/publish-security-assessments@v0
+      with:
+        scan-results-path: ${{ steps.container-scan.outputs.scan-report-path }}
+        connection-string: ${{ secrets.AZ_APPINSIGHTS_CONNECTION_STRING }}
+        subscription-token: ${{ secrets.DEFENDER_TOKEN }}
+
+    - run: docker logout
+
+
+  promote-to-staging:
+    if: inputs.environment == 'staging'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+    - uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - run: az acr login --name ${{ env.acr-registry }}
 
     # Promote Dev to Staging
     - name: 'Re-tag to Promote'
-      if: inputs.environment == 'staging'
       run: |
         docker pull ${{ env.image-name }}:dev-${{ inputs.git-sha }}
         docker tag ${{ env.image-name }}:dev-${{ inputs.git-sha }} ${{ env.image-name }}:staging-${{ inputs.git-sha }}
         docker push ${{ env.image-name }}:staging-${{ inputs.git-sha }}
 
-    - name: 'Docker - Logout'
-      run: docker logout
+    - run: docker logout
