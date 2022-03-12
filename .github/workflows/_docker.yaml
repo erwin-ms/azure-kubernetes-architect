@@ -51,6 +51,7 @@ jobs:
     - uses: Azure/container-scan@v0
       name: 'Docker - Azure Defender Scan'
       # if: inputs.environment == 'dev'
+      continue-on-error: true
       id: container-scan
       with:
         image-name: ${{ env.image-name }}:dev-${{ inputs.git-sha }}
