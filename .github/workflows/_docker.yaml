@@ -15,10 +15,10 @@ on:
     secrets:
       AZURE_CLIENT_ID:
         required: true
-      AZURE_TENANT_ID:
-        required: true
       AZURE_SUBSCRIPTION_ID:
         required: true
+      # AZURE_TENANT_ID:
+      #   required: true
 
 # ===============
 #  Configuration
@@ -38,8 +38,8 @@ jobs:
       uses: azure/login@v1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 
     - run: az acr login --name ${{ env.acr-registry }}
 
@@ -67,7 +67,7 @@ jobs:
       with:
         scan-results-path: ${{ steps.container-scan.outputs.scan-report-path }}
         connection-string: ${{ secrets.AZ_APPINSIGHTS_CONNECTION_STRING }}
-        subscription-token: ${{ secrets.DEFENDER_TOKEN }}
+        subscription-token: ${{ secrets.AZ_DEFENDER_TOKEN }}
 
     - run: docker logout
 
@@ -80,8 +80,8 @@ jobs:
     - uses: azure/login@v1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 
     - run: az acr login --name ${{ env.acr-registry }}
 
