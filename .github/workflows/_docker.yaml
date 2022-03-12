@@ -29,7 +29,7 @@ env:
 
 jobs:
   build-and-push:
-    if: inputs.environment == 'feat/defender-scan'
+    # if: inputs.environment == 'feat/defender-scan' # only dev exists as environment
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
