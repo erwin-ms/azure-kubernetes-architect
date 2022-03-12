@@ -58,7 +58,7 @@ jobs:
       run: echo "git-sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - id: is-dev
-      if: github.ref == 'refs/heads/main' # <=== CONFIGURE branch name
+      if: github.ref == 'refs/heads/feat/defender-scan' # <=== CONFIGURE branch name
       run: |
         echo "target=dev" >> $GITHUB_ENV
         echo "cluster=${{ env.dev-cluster }}" >> $GITHUB_ENV
